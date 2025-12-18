@@ -9,6 +9,7 @@ import Icon from '@/components/ui/icon';
 const Index = () => {
   const [selectedSection, setSelectedSection] = useState('главная');
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainRef = useRef<HTMLElement>(null);
   const aboutRef = useRef<HTMLElement>(null);
@@ -114,8 +115,50 @@ const Index = () => {
                 </div>
               ))}
             </nav>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+            </Button>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t animate-fade-in">
+            <nav className="container mx-auto px-4 py-4 space-y-2">
+              {navigationItems.map((item) => (
+                <div key={item.label}>
+                  <Button
+                    variant={selectedSection === item.label.toLowerCase() ? 'default' : 'ghost'}
+                    className="w-full justify-start text-base"
+                    onClick={() => {
+                      scrollToSection(item.label.toLowerCase(), item.ref);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                  <div className="pl-4 space-y-1 mt-1">
+                    {item.submenu.map((subitem, idx) => (
+                      <button
+                        key={idx}
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                        onClick={() => {
+                          scrollToSection(item.label.toLowerCase(), item.ref);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {subitem}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
 
       <section ref={mainRef} className="relative py-20 overflow-hidden">
@@ -126,19 +169,19 @@ const Index = () => {
               <Badge className="text-sm px-4 py-1 bg-gradient-to-r from-primary to-secondary">
                 Современное образование
               </Badge>
-              <h2 className="text-5xl md:text-6xl font-bold leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 Добро пожаловать в{' '}
                 <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                   МБОУ СОШ №126
                 </span>
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground">
                 Мы создаём будущее через качественное образование, инновационные методики и заботу о каждом ученике
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
-                  className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform"
+                  className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform w-full sm:w-auto"
                   onClick={() => scrollToSection('родителям', parentsRef)}
                 >
                   <Icon name="BookOpen" className="mr-2" size={20} />
@@ -147,7 +190,7 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="hover:scale-105 transition-transform"
+                  className="hover:scale-105 transition-transform w-full sm:w-auto"
                   onClick={() => scrollToSection('контакты', contactsRef)}
                 >
                   <Icon name="Phone" className="mr-2" size={20} />
