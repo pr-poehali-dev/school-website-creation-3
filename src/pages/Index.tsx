@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,7 +7,20 @@ import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
-  const [selectedSection, setSelectedSection] = useState('main');
+  const [selectedSection, setSelectedSection] = useState('главная');
+
+  const mainRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
+  const parentsRef = useRef<HTMLElement>(null);
+  const newsRef = useRef<HTMLElement>(null);
+  const scheduleRef = useRef<HTMLElement>(null);
+  const contactsRef = useRef<HTMLElement>(null);
+  const teachersRef = useRef<HTMLElement>(null);
+
+  const scrollToSection = (section: string, ref: React.RefObject<HTMLElement>) => {
+    setSelectedSection(section);
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const mockGrades = [
     { subject: 'Математика', grades: [5, 4, 5, 5, 4], average: 4.6 },
@@ -42,12 +55,22 @@ const Index = () => {
     'Пятница': ['Русский язык', 'Химия', 'Физкультура', 'Литература', 'ОБЖ'],
   };
 
+  const navigationItems = [
+    { label: 'Главная', ref: mainRef },
+    { label: 'О школе', ref: aboutRef },
+    { label: 'Родителям', ref: parentsRef },
+    { label: 'Новости', ref: newsRef },
+    { label: 'Расписание', ref: scheduleRef },
+    { label: 'Контакты', ref: contactsRef },
+    { label: 'Учителя', ref: teachersRef },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-purple-50">
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection('главная', mainRef)}>
               <div className="w-12 h-12 bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center">
                 <Icon name="GraduationCap" className="text-white" size={28} />
               </div>
@@ -55,18 +78,18 @@ const Index = () => {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                   МБОУ СОШ №126
                 </h1>
-                <p className="text-sm text-muted-foreground">Образование будущего</p>
+                <p className="text-sm text-muted-foreground">Г. Барнаул</p>
               </div>
             </div>
             <nav className="hidden md:flex gap-2">
-              {['Главная', 'О школе', 'Родителям', 'Новости', 'Расписание', 'Контакты', 'Учителя'].map((item) => (
+              {navigationItems.map((item) => (
                 <Button
-                  key={item}
-                  variant={selectedSection === item.toLowerCase().replace(' ', '-') ? 'default' : 'ghost'}
-                  onClick={() => setSelectedSection(item.toLowerCase().replace(' ', '-'))}
+                  key={item.label}
+                  variant={selectedSection === item.label.toLowerCase() ? 'default' : 'ghost'}
+                  onClick={() => scrollToSection(item.label.toLowerCase(), item.ref)}
                   className="transition-all hover:scale-105"
                 >
-                  {item}
+                  {item.label}
                 </Button>
               ))}
             </nav>
@@ -74,7 +97,7 @@ const Index = () => {
         </div>
       </header>
 
-      <section className="relative py-20 overflow-hidden">
+      <section ref={mainRef} className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -92,11 +115,20 @@ const Index = () => {
                 Мы создаём будущее через качественное образование, инновационные методики и заботу о каждом ученике
               </p>
               <div className="flex gap-4">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform"
+                  onClick={() => scrollToSection('родителям', parentsRef)}
+                >
                   <Icon name="BookOpen" className="mr-2" size={20} />
                   Электронный дневник
                 </Button>
-                <Button size="lg" variant="outline" className="hover:scale-105 transition-transform">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="hover:scale-105 transition-transform"
+                  onClick={() => scrollToSection('контакты', contactsRef)}
+                >
                   <Icon name="Phone" className="mr-2" size={20} />
                   Связаться с нами
                 </Button>
@@ -114,8 +146,14 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
+      <section ref={aboutRef} className="py-16 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">О школе</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              МБОУ СОШ №126 — современное образовательное учреждение с богатой историей и высокими академическими стандартами
+            </p>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { icon: 'Users', title: '850+ учеников', desc: 'Активных и талантливых' },
@@ -136,7 +174,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <section ref={parentsRef} className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-gradient-to-r from-secondary to-accent text-white">
@@ -238,7 +276,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
+      <section ref={newsRef} className="py-16 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Новости школы</h2>
@@ -262,10 +300,11 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <section ref={teachersRef} className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Наши учителя</h2>
+            <p className="text-xl text-muted-foreground">Команда профессионалов с огромным опытом</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {teachers.map((teacher, idx) => (
@@ -286,10 +325,11 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
+      <section ref={scheduleRef} className="py-16 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Расписание уроков</h2>
+            <p className="text-xl text-muted-foreground">Примерное расписание для 9-х классов</p>
           </div>
           <Card className="max-w-4xl mx-auto">
             <CardContent className="pt-6">
@@ -317,18 +357,20 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-r from-primary via-secondary to-accent text-white">
+      <section ref={contactsRef} className="py-16 bg-gradient-to-r from-primary via-secondary to-accent text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl font-bold mb-6">Контакты</h2>
+            <p className="text-lg mb-12 opacity-90">Свяжитесь с нами любым удобным способом</p>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center gap-3">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
                   <Icon name="MapPin" size={32} />
                 </div>
                 <div>
-                  <p className="font-semibold">Адрес</p>
-                  <p className="text-sm opacity-90">г. Москва, ул. Школьная, 126</p>
+                  <p className="font-semibold text-lg">Адрес</p>
+                  <p className="text-sm opacity-90">г. Барнаул</p>
+                  <p className="text-sm opacity-90">ул. Юрина, 190, 192</p>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-3">
@@ -336,8 +378,10 @@ const Index = () => {
                   <Icon name="Phone" size={32} />
                 </div>
                 <div>
-                  <p className="font-semibold">Телефон</p>
-                  <p className="text-sm opacity-90">+7 (495) 123-45-67</p>
+                  <p className="font-semibold text-lg">Телефон</p>
+                  <a href="tel:+73852567134" className="text-sm opacity-90 hover:opacity-100 transition-opacity underline">
+                    +7 (3852) 567-134
+                  </a>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-3">
@@ -345,18 +389,49 @@ const Index = () => {
                   <Icon name="Mail" size={32} />
                 </div>
                 <div>
-                  <p className="font-semibold">Email</p>
-                  <p className="text-sm opacity-90">school126@edu.ru</p>
+                  <p className="font-semibold text-lg">Email</p>
+                  <a 
+                    href="mailto:school@barnaul126.ru" 
+                    className="text-sm opacity-90 hover:opacity-100 transition-opacity underline"
+                  >
+                    school@barnaul126.ru
+                  </a>
                 </div>
               </div>
+            </div>
+            <div className="mt-12">
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="bg-white text-primary hover:bg-white/90"
+                onClick={() => window.open('https://yandex.ru/maps/?text=Барнаул, улица Юрина, 190', '_blank')}
+              >
+                <Icon name="MapPin" className="mr-2" size={20} />
+                Открыть на карте
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       <footer className="bg-gray-900 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm opacity-75">© 2025 МБОУ СОШ №126. Все права защищены.</p>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-center md:text-left">
+              <p className="text-sm opacity-75">© 2025 МБОУ СОШ №126. Все права защищены.</p>
+              <p className="text-xs opacity-60 mt-1">г. Барнаул, ул. Юрина, 190, 192</p>
+            </div>
+            <div className="flex gap-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:text-primary"
+                onClick={() => scrollToSection('главная', mainRef)}
+              >
+                Наверх
+              </Button>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
