@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [selectedSection, setSelectedSection] = useState('главная');
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
   const mainRef = useRef<HTMLElement>(null);
   const aboutRef = useRef<HTMLElement>(null);
@@ -56,13 +57,13 @@ const Index = () => {
   };
 
   const navigationItems = [
-    { label: 'Главная', ref: mainRef },
-    { label: 'О школе', ref: aboutRef },
-    { label: 'Родителям', ref: parentsRef },
-    { label: 'Новости', ref: newsRef },
-    { label: 'Расписание', ref: scheduleRef },
-    { label: 'Контакты', ref: contactsRef },
-    { label: 'Учителя', ref: teachersRef },
+    { label: 'Главная', ref: mainRef, submenu: ['Новости', 'События', 'Объявления'] },
+    { label: 'О школе', ref: aboutRef, submenu: ['Основные сведения', 'Документы', 'История', 'Руководство'] },
+    { label: 'Родителям', ref: parentsRef, submenu: ['Электронный дневник', 'Питание', 'Безопасность', 'FAQ'] },
+    { label: 'Новости', ref: newsRef, submenu: ['Все новости', 'Мероприятия', 'Достижения'] },
+    { label: 'Расписание', ref: scheduleRef, submenu: ['Уроки', 'Звонки', 'Каникулы'] },
+    { label: 'Контакты', ref: contactsRef, submenu: ['Телефоны', 'Email', 'Адрес', 'Карта'] },
+    { label: 'Учителя', ref: teachersRef, submenu: ['Педагогический состав', 'Администрация'] },
   ];
 
   return (
@@ -83,14 +84,34 @@ const Index = () => {
             </div>
             <nav className="hidden md:flex gap-2">
               {navigationItems.map((item) => (
-                <Button
+                <div 
                   key={item.label}
-                  variant={selectedSection === item.label.toLowerCase() ? 'default' : 'ghost'}
-                  onClick={() => scrollToSection(item.label.toLowerCase(), item.ref)}
-                  className="transition-all hover:scale-105"
+                  className="relative"
+                  onMouseEnter={() => setHoveredButton(item.label)}
+                  onMouseLeave={() => setHoveredButton(null)}
                 >
-                  {item.label}
-                </Button>
+                  <Button
+                    variant={selectedSection === item.label.toLowerCase() ? 'default' : 'ghost'}
+                    onClick={() => scrollToSection(item.label.toLowerCase(), item.ref)}
+                    className="transition-all hover:scale-105"
+                  >
+                    {item.label}
+                    <Icon name="ChevronDown" className="ml-1" size={16} />
+                  </Button>
+                  {hoveredButton === item.label && (
+                    <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border p-2 min-w-[200px] animate-fade-in z-50">
+                      {item.submenu.map((subitem, idx) => (
+                        <button
+                          key={idx}
+                          className="w-full text-left px-4 py-2 hover:bg-primary/10 rounded-md transition-colors text-sm"
+                          onClick={() => scrollToSection(item.label.toLowerCase(), item.ref)}
+                        >
+                          {subitem}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </nav>
           </div>
